@@ -1,3 +1,5 @@
+from cgitb import text
+from turtle import title
 import dash
 from dash import dcc,html
 from dash.dependencies import Input, Output
@@ -40,7 +42,7 @@ def update_figure(time_slider):
         ls.append(i[0:16])
     dff = df[(rng1 <= df['time']) & (df['time'] <= rng2)]
   
-    fig = px.bar(x=dff['time'], y=dff['forecast'])
+    fig = px.bar(x=dff['time'],text=dff['time'], y=dff['forecast'],labels=dict(x="Time", y="Forecast"))
     fig.update_xaxes(type='category')
     fig.update_layout()
     return fig
