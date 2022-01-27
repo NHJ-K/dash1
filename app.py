@@ -1,5 +1,3 @@
-from cgitb import text
-from turtle import title
 import dash
 from dash import dcc,html
 from dash.dependencies import Input, Output
@@ -10,8 +8,6 @@ import json
 
 app = dash.Dash(__name__)
 
-# assume you have a "long-form" data frame
-# see https://plotly.com/python/px-arguments/ for more options
 df = pd.read_json('test.json')
 app.layout = html.Div([
     dcc.Graph(id='graph-with-slider'),
@@ -35,14 +31,13 @@ def update_figure(time_slider):
         rn1 = '0' + str(rn1)
     if rn2 < 10:
         rn2 = '0' + str(rn2)
+
     rng1 = "2022-01-15 " +str(rn1)+ ":00:00"
     rng2 = "2022-01-15 " + str(rn2) + ":00:00"
-    ls=[]
-    for i in df['time']:
-        ls.append(i[0:16])
+    
     dff = df[(rng1 <= df['time']) & (df['time'] <= rng2)]
   
-    fig = px.bar(x=dff['time'],text=dff['time'], y=dff['forecast'],labels=dict(x="Time", y="Forecast"))
+    fig = px.bar(x=dff['time'], y=dff['forecast'])
     fig.update_xaxes(type='category')
     fig.update_layout()
     return fig
