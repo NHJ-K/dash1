@@ -4,13 +4,16 @@ from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
+import json
 
 app = dash.Dash(__name__)
 
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
 df = pd.read_json('test.json')
-
+dictionary = json.load(open('test.json', 'r'))
+time = [ dictionary[lst]['time'] for lst in range(len(dictionary)-1) ]
+forecast = [ float(dictionary[lst]['forecast']) for lst in range(len(dictionary)-1)]
 app.layout = html.Div([
     dcc.Graph(id='graph-with-slider'),
     dcc.RangeSlider(
@@ -37,8 +40,8 @@ def update_figure(time_slider):
 
     dff = df[(rng1 <= df['time']) & (df['time'] <= rng2)]
   
-    fig = px.bar(x=dff['time'], y=dff['forecast'])
-
+    fig = px.bar(x=dff['time'],text=dff['time'], y=dff['forecast'])
+    fig.update_layout(xaxis_range=[time[0],time[-1]])
     fig.update_layout()
 
     return fig
