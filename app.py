@@ -55,6 +55,8 @@ def update_figure(time_slider,date_picker):
     fig = px.bar(x=dff['time'], y=dff['renewablespercentage'])
     fig.update_xaxes(type='category')
     fig.update_layout()
+    fig.add_trace(go.Scatter(x=dff['time'],y=dff['humidity'],name='Humidity'))
+    fig.add_trace(go.Scatter(x=dff['time'],y=dff['windspeed'],name='Wind Speed'))
     return fig
 
 
