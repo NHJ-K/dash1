@@ -5,11 +5,38 @@ from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
-import json
+import sqlite3
 
 app = dash.Dash(__name__)
 
-df = pd.read_csv('dataset.csv')
+conn = sqlite3.connect('test_database') 
+c = conn.cursor()
+
+query = "CREATE TABLE IF NOT EXISTS forecasts(time TEXT,renewablespercentage TEXT,date TEXT, hour TEXT)"
+c.execute(query)
+conn.commit()
+
+
+
+df = pd.read_csv('dataset.csv',usecols=['time','renewablespercentage'])
+df['time'] = pd.to_datetime(df['time'])
+df['date'] = df['time'].dt.date
+df['hour'] = df['time'].dt.hour
+df['time'] = df['time'].dt.time
+c.execute("SELECT * FROM forecasts") 
+df1 = pd.DataFrame(c.fetchall(),columns=['time','renewablespercentage','date','hour'])
+result = pd.concat([df, df1]).drop_duplicates()
+c.execute("DELETE FROM forecasts")
+conn.commit()
+result.to_sql('forecasts', conn, if_exists='replace', index = False)
+conn.close()
+
+
+
+
+df=pd.read_csv('dataset.csv')
+
+
 #print(df)
 app.layout = html.Div([ #main div
     html.Div( #graph blcock
@@ -18,7 +45,6 @@ app.layout = html.Div([ #main div
     html.Div([#controls block
     html.Span("Time selecter:", style={"font-weight": "bold"}),
     html.Div(#time range
-
         dcc.RangeSlider(
         id='time-slider',
         min=0,
@@ -48,6 +74,7 @@ app.layout = html.Div([ #main div
     Input('date-picker', 'date')
 )
 def update_figure(time_slider,date_picker):
+
     rn1 = time_slider[0]
     rn2 = time_slider[1]
     if date_picker is not None:
