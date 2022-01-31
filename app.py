@@ -17,7 +17,6 @@ c.execute(query)
 conn.commit()
 
 
-
 df = pd.read_csv('dataset.csv',usecols=['time','renewablespercentage'])
 df['time'] = pd.to_datetime(df['time'])
 df['date'] = df['time'].dt.date
